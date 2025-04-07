@@ -6,7 +6,7 @@ import { FaPlay } from "react-icons/fa";
 
 const CHUNK_SIZE = 20
 
-export const Home = () => {
+export const Movies = () => {
     const [allMovies, setAllMovies] = useState<Title[]>([])
 
     // Load CSV once
@@ -74,24 +74,15 @@ export const Home = () => {
         return (
             <div className="flex flex-col items-start justify-center w-full overflow-hidden h-fit relative">
                 <h2 className="text-2xl text-zinc-100 font-bold mb-4 px-8">{title}</h2>
-
-                <div className="relative w-full">
-                    {/* Scrollable container */}
-                    <div
-                        ref={containerRef}
-                        className="flex flex-row gap-4 overflow-x-auto w-full min-w-0 px-8 relative scroll-smooth no-scrollbar"
-                    >
-                        {visibleMovies.map((movie, index) => (
-                            <Title key={index} movie={movie} />
-                        ))}
-                        <div ref={loaderRef} className="w-[2px] h-full bg-transparent" />
-                    </div>
-
-                    {/* Left fade */}
-                    <div className="pointer-events-none absolute top-0 left-0 h-full w-10 bg-gradient-to-r from-[#191919] to-transparent z-10" />
-
-                    {/* Right fade */}
-                    <div className="pointer-events-none absolute top-0 right-0 h-full w-16 bg-gradient-to-l from-[#191919] to-transparent z-10" />
+                <div
+                    ref={containerRef}
+                    className="flex flex-row gap-4 overflow-x-auto w-full min-w-0 px-8 relative scroll-smooth no-scrollbar"
+                >
+                    {visibleMovies.map((movie, index) => (
+                        <Title key={index} movie={movie} />
+                    ))}
+                    <div ref={loaderRef} className="w-[2px] h-full bg-transparent" />
+                    <div className="pointer-events-none fixed right-0 h-80 w-16 bg-gradient-to-l from-[#191919] to-transparent" />
                 </div>
             </div>
         );
@@ -121,19 +112,12 @@ export const Home = () => {
         genres: string[]
     }
     const recentlyAdded: RecentlyAdded | null = allMovies.length
-        ? findTitle('All American')
+        ? findTitle('100 Meters')
         : null
 
-    const allGenres = allMovies.reduce((acc, movie) => {
-        const movieGenres = Object.keys(movie).filter(key => genres.includes(key) && movie[key] === '1')
-        return [...acc, ...movieGenres]
-    }, [] as string[])
-        .filter((genre, index, self) => self.indexOf(genre) === index)
-        .sort((a, b) => a.localeCompare(b))
-
     return (
-        <div className="flex flex-col items-center justify-start bg-[#191919] no-scrollbar w-full pb-10 gap-8 py-10">
-            <div className="flex flex-col items-start justify-center w-full h-[calc(80%-20px)] overflow-clip text-white gap-4 relative">
+        <div className="flex flex-col items-center justify-start bg-[#191919] no-scrollbar w-full">
+            <div className="flex flex-col items-start justify-center w-full overflow-clip h-[calc(80% - 20px)] text-white gap-4 mb-8 relative">
                 <img
                     src={`https://cdn.spotparking.app/public/posters/${recentlyAdded?.obj.title}.jpg`}
                     alt={recentlyAdded?.obj.title}
@@ -144,10 +128,9 @@ export const Home = () => {
                         target.src = 'https://blocks.astratic.com/img/general-img-portrait.png'
                     }}
                     className="w-full object-cover aspect-video object-top"
-                    style={{}}
                 />
                 <div className='absolute bottom-10 left-10 flex flex-col gap-3 z-10'>
-                    <p className='font-light text-3xl text-gray-300'>Recently Added</p>
+                    <p className='font-light text-3xl text-shadow-lg'>Recently Added</p>
                     <p className='font-semibold text-6xl text-shadow-lg'>{recentlyAdded?.obj.title}</p>
                     <p className='font-light text-md text-gray-200 text-shadow-lg'>{recentlyAdded?.genres.join(", ")}</p>
 
@@ -162,29 +145,7 @@ export const Home = () => {
             </div>
 
             <Section movies={allMovies} title="You May Like..." />
-            <Section movies={allMovies} title="Recommended" />
-
-            <div className="w-screen relative overflow-hidden bg-[#050505] pb-10 pt-6 shadow-lg">
-                <h2 className="text-2xl text-zinc-100 font-bold mb-4 px-8">Genres</h2>
-
-                {/* Scrollable grid with 2 rows */}
-                <div className="grid grid-rows-1 auto-cols-max grid-flow-col gap-4 px-8 overflow-x-auto no-scrollbar pr-12">
-                    {allGenres.map((genre, index) => (
-                        <div
-                            key={index}
-                            className="bg-[#383838] text-white px-6 py-8 rounded-lg text-center min-w-[150px] flex hover:bg-[#191919] items-center justify-center text-xl max-w-96 cursor-pointer text-wrap transition"
-                        >
-                            {genre}
-                        </div>
-                    ))}
-                </div>
-
-                {/* Right fade */}
-                <div className="pointer-events-none absolute left-0 top-0 h-full w-8 bg-gradient-to-r from-[#050505] to-transparent z-10" />
-                <div className="pointer-events-none absolute right-0 top-0 h-full w-16 bg-gradient-to-l from-[#050505] to-transparent z-10" />
-            </div>
-
-            <Section movies={allMovies} title="Recommended" />
+            <Section movies={allMovies} title="Trending" />
         </div>
     );
 };

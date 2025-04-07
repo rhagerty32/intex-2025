@@ -1,9 +1,12 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { Home } from './pages/Home'
-import { Profile } from './pages/Profile'
+import { Account } from './pages/Account'
 import { Navbar } from './components/Navbar'
 import { useEffect, useRef, useState } from 'react';
 import SearchBar from './components/SearchBar';
+import { Movies } from './pages/Movies';
+import "./index.css"
+import { PrivacyPolicy } from './pages/PrivacyPolicy';
 
 function App() {
     const [searchActive, setSearchActive] = useState(false);
@@ -58,9 +61,10 @@ function App() {
     return (
         <>
             <Router>
-                <div className='h-screen flex flex-col bg-zinc-900'>
+                <div className="h-screen flex flex-col bg-[#191919] no-scrollbar relative">
                     <Navbar setSearchActive={setSearchActive} ref={searchInputRef} />
 
+                    {/* Search Overlay */}
                     <div
                         onClick={handleClickOutside}
                         className={`${searchActive
@@ -77,7 +81,7 @@ function App() {
                         />
                         <div
                             ref={searchWrapperRef}
-                            className='absolute z-[5000001] top-[40%] w-full flex flex-col justify-start items-center gap-2'
+                            className="absolute z-[5000001] top-[40%] w-full flex flex-col justify-start items-center gap-2"
                         >
                             <SearchBar
                                 ref={searchInputRef}
@@ -87,11 +91,15 @@ function App() {
                         </div>
                     </div>
 
-                    <div className="h-16 shrink-0" />
-                    <Routes>
-                        <Route path="/" element={<Home />} />
-                        <Route path="/profile" element={<Profile />} />
-                    </Routes>
+                    {/* Main content below the navbar */}
+                    <div className="flex-1 pt-16 overflow-auto">
+                        <Routes>
+                            <Route path="/" element={<Home />} />
+                            <Route path="/movies" element={<Movies />} />
+                            <Route path="/account" element={<Account />} />
+                            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                        </Routes>
+                    </div>
                 </div>
             </Router>
         </>

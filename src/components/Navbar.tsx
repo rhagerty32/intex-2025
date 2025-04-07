@@ -1,23 +1,33 @@
-import { IoHomeOutline } from "react-icons/io5";
+import { FiTv } from "react-icons/fi";
 import { MdPerson } from "react-icons/md";
 import { Link } from "react-router-dom";
 import { FiSearch } from 'react-icons/fi'
-import React, { forwardRef } from "react";
+import React, { forwardRef, useEffect, useState } from "react";
 import { LuCommand } from "react-icons/lu";
 import { TbMovie } from "react-icons/tb";
+import { Logo } from "./logo";
 
 export const Navbar = forwardRef<HTMLInputElement, { setSearchActive: (value: boolean) => void }>(({ setSearchActive }, ref) => {
 
     const HeaderLink = ({ icon, text, link }: { icon: any, text: string, link: string }) => {
         return (
             <Link to={link} className="flex flex-row justify-center items-center hover:bg-zinc-800 p-2 my-2 rounded gap-2 cursor-pointer transition">
-                {icon}
-                <p>{text}</p>
+                <div className="flex lg:hidden xl:flex">
+                    {icon}
+                </div>
+                <div className="hidden lg:flex xl:flex">
+                    <p>{text}</p>
+                </div>
             </Link>
         );
     };
 
     const headerLinks = [
+        {
+            icon: <FiTv className="text-zinc-100" />,
+            text: "Tv Shows",
+            link: "/tv-shows"
+        },
         {
             icon: <TbMovie className="text-zinc-100" />,
             text: "Movies",
@@ -33,9 +43,9 @@ export const Navbar = forwardRef<HTMLInputElement, { setSearchActive: (value: bo
     const platform = navigator.userAgent.includes("Mac") ? "Mac" : navigator.userAgent.includes("Win") ? "Windows" : "Other";
 
     return (
-        <div className="bg-transparent relative border-y border-zinc-800 text-zinc-100 h-16 px-8 flex flex-row justify-between items-center">
+        <div className="bg-[#191919] fixed z-50 w-full border-y border-zinc-800 text-zinc-100 h-16 px-8 flex flex-row justify-between items-center">
             <Link to="/">
-                <img src="/logo.png" alt="Logo" className="h-10 w-10" />
+                <Logo />
             </Link>
 
             {/* Search Bar */}
@@ -49,8 +59,8 @@ export const Navbar = forwardRef<HTMLInputElement, { setSearchActive: (value: bo
                 >
                     <div className="flex flex-row justify-center items-center gap-2 w-full px-2">
                         <FiSearch size={18} className="text-stone-900" />
-                        <div className="w-full h-full bg-transparent outline-none text-zinc-500">
-                            Search
+                        <div className="w-full h-full bg-transparent outline-none text-zinc-500 text-ellipsis line-clamp-1">
+                            Search for movies, shows, and more
                         </div>
                         <p className="flex flex-row justify-center items-center mr-2 gap-0 mt-[1px] w-fit text-zinc-500 text-xs">
                             {platform ? <LuCommand size={13} className="text-zinc-500" /> : "Ctrl"}+K

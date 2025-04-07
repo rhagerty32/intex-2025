@@ -9,6 +9,21 @@ import { useNavigate } from 'react-router-dom'
 import { FiSearch } from 'react-icons/fi'
 import Fuse from 'fuse.js'
 import { SEARCH_INDEX } from './searchIndex'
+import Papa from 'papaparse'
+
+type Movie = {
+    show_id: string
+    type: string
+    title: string
+    director: string
+    cast: string
+    country: string
+    release_year: string
+    rating: string
+    duration: string
+    description: string
+    [key: string]: any
+}
 
 type SearchItem = {
     title: string
@@ -23,21 +38,63 @@ type Props = {
     ref: ForwardedRef<HTMLInputElement>
 }
 
+
+
 const SearchBar = forwardRef<HTMLInputElement, Props>(({ setSearchActive, shouldHighlight }, ref) => {
     const [searchResults, setSearchResults] = useState<SearchItem[]>([])
     const [selectedIndex, setSelectedIndex] = useState(0)
     const [fuse, setFuse] = useState<Fuse<SearchItem> | null>(null)
     const navigate = useNavigate()
 
-    const baseIndex: SearchItem[] = [...SEARCH_INDEX]
-
     useEffect(() => {
-        const fuseInstance = new Fuse(baseIndex, {
-            keys: ['title', 'keywords'],
-            threshold: 0.3,
-        })
-        setFuse(fuseInstance)
+        fetch('/movies_titles.csv')
+            .then((res) => res.text())
+            .then((csvText) => {
+                Papa.parse<Movie>(csvText, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: (result) => {
+                        const movieItems = result.data.filter((row) => row.title?.trim())
+
+                        const indexedMovies = movieItems.map((movie) => ({
+                            title: `${movie.title}`,
+                            path: `/movies/${movie.show_id}`,
+                            keywords: [
+                                movie.title?.toLowerCase() ?? '',
+                                movie.description?.toLowerCase() ?? '',
+                                movie.director?.toLowerCase() ?? '',
+                                movie.cast?.toLowerCase() ?? '',
+                                movie.country?.toLowerCase() ?? '',
+                                movie.release_year ?? '',
+                                movie.rating?.toLowerCase() ?? '',
+                                movie.duration?.toLowerCase() ?? '',
+                                ...Object.keys(movie)
+                                    .filter((key) => movie[key] === '1') // genre flags
+                                    .map((genre) => genre.toLowerCase())
+                            ],
+                            data: movie,
+                        }))
+
+                        const fullIndex = [...SEARCH_INDEX, ...indexedMovies]
+
+                        const fuseInstance = new Fuse(fullIndex, {
+                            keys: ['title', 'keywords'],
+                            threshold: 0.3,
+                        })
+
+                        setFuse(fuseInstance)
+                    },
+                })
+            })
     }, [])
+
+    function debounce<T extends (...args: any[]) => void>(fn: T, delay: number): (...args: Parameters<T>) => void {
+        let timer: NodeJS.Timeout
+        return (...args: Parameters<T>) => {
+            clearTimeout(timer)
+            timer = setTimeout(() => fn(...args), delay)
+        }
+    }
 
     const handleSearch = (query: string) => {
         if (!query.trim() || !fuse) {
@@ -46,10 +103,20 @@ const SearchBar = forwardRef<HTMLInputElement, Props>(({ setSearchActive, should
             return
         }
 
-        const results = fuse.search(query).map((result) => ({
-            ...result.item,
-            title: result.item.title.replace(/~~/g, ' '),
-        }))
+        const rawResults = fuse.search(query).slice(0, 50) // ✅ Limit to 50 results
+
+        const results = rawResults.map((result) => {
+            const item = result.item
+            const title = item?.title ?? ''
+
+            return {
+                ...item,
+                title: title.includes('~~') ? title.replace(/~~/g, ' ') : title,
+                data: item?.data ?? null,
+                path: item?.path ?? '/',
+            }
+        }).filter(item => item.title && item.path)
+
         setSearchResults(results)
         setSelectedIndex(0)
     };
@@ -102,12 +169,9 @@ const SearchBar = forwardRef<HTMLInputElement, Props>(({ setSearchActive, should
 
     const handleSearchItemClick = useCallback((result: SearchItem) => {
         if (result?.title?.includes('~~')) {
-            const [type, name] = result.title.split('~~')
-            if (type === 'User' && result.data) {
-                sessionStorage.setItem('individualUser', JSON.stringify(result.data))
-            }
-            if (type === 'License Plate') {
-                sessionStorage.setItem('plate', name)
+            const [type, _name] = result.title.split('~~')
+            if (type === 'Movie' && result.data) {
+                sessionStorage.setItem('selectedMovie', JSON.stringify(result.data))
             }
         }
 
@@ -118,20 +182,22 @@ const SearchBar = forwardRef<HTMLInputElement, Props>(({ setSearchActive, should
             ; (ref as React.RefObject<HTMLInputElement>)?.current?.blur()
     }, [navigate, setSearchActive, ref])
 
+    const debouncedSearch = useCallback(debounce(handleSearch, 200), [fuse])
+
     return (
         <div className="flex flex-col justify-center items-center absolute left-1/2 -translate-x-1/2 gap-2 w-1/2">
             <div
-                className={`w-full shadow-md border py-4 bg-zinc-300 rounded-2xl flex flex-col justify-start items-center`}
+                className={`w-full shadow-md border-white py-4 bg-zinc-300 rounded-2xl flex flex-col justify-start items-center`}
                 onClick={() => (ref as React.RefObject<HTMLInputElement>)?.current?.focus()}
             >
                 <div className="flex flex-row justify-center items-center gap-2 w-full px-2">
                     <FiSearch size={18} className="text-stone-900" />
                     <input
                         type="text"
-                        placeholder="Search"
+                        placeholder={'Search for movies, shows, and more'}
                         className="w-full h-full bg-transparent outline-none text-black text-xl"
                         ref={ref}
-                        onChange={(e) => handleSearch(e.target.value)}
+                        onChange={(e) => debouncedSearch(e.target.value)}
                         onKeyDown={handleKeyDown}
                     />
                 </div>
@@ -140,7 +206,7 @@ const SearchBar = forwardRef<HTMLInputElement, Props>(({ setSearchActive, should
                     <>
                         <hr className="w-full border-t-2 border-stone-200 mt-4" />
                         <p className="text-sm font-semibold text-stone-400 mt-4 text-left w-full px-4">
-                            Total results ({searchResults.length})
+                            Total results ({searchResults.length >= 50 ? '50+' : searchResults.length})
                         </p>
                         <div className="w-full p-4 pb-0 max-h-96 overflow-auto flex flex-col no-scrollbar">
                             {searchResults.map((result, idx) => (
@@ -156,21 +222,17 @@ const SearchBar = forwardRef<HTMLInputElement, Props>(({ setSearchActive, should
                                 >
                                     <div className="flex flex-row gap-2 items-center justify-center">
                                         <p className="text-sm font-medium text-black">
-                                            {result.title.includes('~~')
-                                                ? result.title.split('~~')[1]
-                                                : result.title}
+                                            {result.title}
                                         </p>
                                         {result.data && (
                                             <p className="text-xs font-normal text-stone-500">
-                                                ({result.data.email})
+                                                ({result.data.release_year})
                                             </p>
                                         )}
                                     </div>
-                                    {result.title.includes('~~') && (
-                                        <p className="text-xs font-normal text-stone-500">
-                                            {result.title.split('~~')[0]}
-                                        </p>
-                                    )}
+                                    <p className="text-xs font-normal text-stone-500">
+                                        {result.data.type}
+                                    </p>
                                 </div>
                             ))}
                         </div>
