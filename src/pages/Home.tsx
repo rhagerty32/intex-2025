@@ -132,12 +132,11 @@ export const Home = () => {
         .sort((a, b) => a.localeCompare(b))
 
     return (
-        <div className="flex flex-col items-center justify-start bg-[#191919] no-scrollbar w-full pb-10 gap-8 py-10">
+        <div className="flex flex-col items-center justify-start bg-[#191919] no-scrollbar w-full pb-10 gap-8 py-0">
             <div className="flex flex-col items-start justify-center w-full h-[calc(80%-20px)] overflow-clip text-white gap-4 relative">
                 <img
                     src={`https://cdn.spotparking.app/public/posters/${recentlyAdded?.obj.title}.jpg`}
                     alt={recentlyAdded?.obj.title}
-                    loading="lazy"
                     onError={(e) => {
                         const target = e.target as HTMLImageElement
                         target.onerror = null
@@ -184,7 +183,8 @@ export const Home = () => {
                 <div className="pointer-events-none absolute right-0 top-0 h-full w-16 bg-gradient-to-l from-[#050505] to-transparent z-10" />
             </div>
 
-            <Section movies={allMovies} title="Recommended" />
+            <Section movies={allMovies} title="Popular TV Shows" />
+            <Section movies={allMovies} title="Horror" />
         </div>
     );
 };

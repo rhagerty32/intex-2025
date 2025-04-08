@@ -5,7 +5,7 @@ import { genres } from '../utils/genres'
 
 const CHUNK_SIZE = 40
 
-export const Movies = () => {
+export const TVShows = () => {
     const [allMovies, setAllMovies] = useState<Title[]>([])
     const [visibleMovies, setVisibleMovies] = useState<Title[]>([])
     const [selectedGenre, setSelectedGenre] = useState<string>('Action')
@@ -22,7 +22,7 @@ export const Movies = () => {
                     header: true,
                     skipEmptyLines: true,
                     complete: (result) => {
-                        const rows = result.data.filter(row => row.title?.trim() && row.type === 'Movie')
+                        const rows = result.data.filter(row => row.title?.trim() && row.type === 'TV Show')
                         const sorted = rows.sort((a, b) => a.title.localeCompare(b.title))
                         setAllMovies(sorted)
                         setLoading(false)
@@ -86,7 +86,7 @@ export const Movies = () => {
 
     return (
         <div className="flex flex-col items-center justify-center bg-[#191919] no-scrollbar w-full gap-10 mt-10">
-            <p className='font-semibold text-4xl -mt-5 -mb-5 text-shadow-lg text-white'>Movies</p>
+            <p className='font-semibold text-4xl -mt-5 -mb-5 text-shadow-lg text-white'>TV Shows</p>
 
             {loading && (
                 <div className="w-full flex justify-center py-8">

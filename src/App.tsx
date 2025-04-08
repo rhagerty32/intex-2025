@@ -7,6 +7,8 @@ import SearchBar from './components/SearchBar';
 import { Movies } from './pages/Movies';
 import "./index.css"
 import { PrivacyPolicy } from './pages/PrivacyPolicy';
+import { Footer } from './components/Footer';
+import { TVShows } from './pages/TVShows';
 
 function App() {
     const [searchActive, setSearchActive] = useState(false);
@@ -57,6 +59,11 @@ function App() {
         };
     }, [searchActive]);
 
+    const noFooterPages = [
+        '/tv-shows',
+        '/movies',
+    ];
+
 
     return (
         <>
@@ -95,10 +102,18 @@ function App() {
                     <div className="flex-1 pt-16 overflow-auto">
                         <Routes>
                             <Route path="/" element={<Home />} />
+                            <Route path="/tv-shows" element={<TVShows />} />
                             <Route path="/movies" element={<Movies />} />
                             <Route path="/account" element={<Account />} />
                             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                         </Routes>
+
+                        {/* Footer */}
+                        {!noFooterPages.includes(window.location.pathname) && (
+                            <div className="flex items-center justify-center w-full h-20 bg-[#191919]">
+                                <Footer />
+                            </div>
+                        )}
                     </div>
                 </div>
             </Router>
