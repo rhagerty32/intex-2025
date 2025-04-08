@@ -7,7 +7,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 const repoName = 'intex-2025'
 
 export default defineConfig({
-    base: `/${repoName}/`, // GitHub Pages base path
+    base: `/`,
     plugins: [
         react(),
         tailwindcss(),
@@ -21,7 +21,7 @@ export default defineConfig({
                 theme_color: '#503047',
                 background_color: '#191919',
                 display: 'standalone',
-                start_url: `/${repoName}/`, // so it starts at correct base
+                start_url: `/`,
                 icons: [
                     {
                         src: 'pwa-192x192.png',
