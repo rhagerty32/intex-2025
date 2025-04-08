@@ -3,11 +3,11 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
-// ✅ Replace with your actual GitHub repo name
+const isProd = process.env.NODE_ENV === 'production'
 const repoName = 'intex-2025'
 
 export default defineConfig({
-    base: `/`,
+    base: isProd ? `/${repoName}/` : '/',
     plugins: [
         react(),
         tailwindcss(),
@@ -21,7 +21,7 @@ export default defineConfig({
                 theme_color: '#503047',
                 background_color: '#191919',
                 display: 'standalone',
-                start_url: `/`,
+                start_url: isProd ? `/${repoName}/` : '/',
                 icons: [
                     {
                         src: 'pwa-192x192.png',
@@ -38,9 +38,9 @@ export default defineConfig({
                         sizes: '512x512',
                         type: 'image/png',
                         purpose: 'any maskable',
-                    }
-                ]
-            }
-        })
-    ]
+                    },
+                ],
+            },
+        }),
+    ],
 })
