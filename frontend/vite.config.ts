@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
 // ✅ Replace with your actual GitHub repo name
-const repoName = 'intex-frontend'
+const repoName = 'intex-2025'
 
 export default defineConfig({
     base: `/${repoName}/`, // GitHub Pages base path
