@@ -3,7 +3,11 @@ import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
+// ✅ Replace with your actual GitHub repo name
+const repoName = 'intex-frontend'
+
 export default defineConfig({
+    base: `/${repoName}/`, // GitHub Pages base path
     plugins: [
         react(),
         tailwindcss(),
@@ -11,13 +15,13 @@ export default defineConfig({
             registerType: 'autoUpdate',
             includeAssets: ['favicon.svg', 'favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
             manifest: {
-                name: 'My Cool App',
-                short_name: 'CoolApp',
-                description: 'My Awesome React + TS + Tailwind PWA!',
-                theme_color: '#0f172a',
-                background_color: '#ffffff',
+                name: 'CineNiche',
+                short_name: 'CineNiche',
+                description: 'Curated classics, indie gold, and global gems.',
+                theme_color: '#503047',
+                background_color: '#191919',
                 display: 'standalone',
-                start_url: '/',
+                start_url: `/${repoName}/`, // so it starts at correct base
                 icons: [
                     {
                         src: 'pwa-192x192.png',
@@ -38,5 +42,5 @@ export default defineConfig({
                 ]
             }
         })
-    ],
+    ]
 })
