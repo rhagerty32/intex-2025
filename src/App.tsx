@@ -9,6 +9,8 @@ import "./index.css"
 import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { Footer } from './components/Footer';
 import { TVShows } from './pages/TVShows';
+import { Title } from './pages/Title';
+import { Login } from './pages/Login';
 
 function App() {
     const [searchActive, setSearchActive] = useState(false);
@@ -60,10 +62,11 @@ function App() {
     }, [searchActive]);
 
     const noFooterPages = [
-        '/tv-shows',
-        '/movies',
+        'tv-shows',
+        'movies',
+        'login',
+        'sign-up'
     ];
-
 
     return (
         <>
@@ -77,7 +80,7 @@ function App() {
                         className={`${searchActive
                             ? 'opacity-100 touch-auto pointer-events-auto'
                             : 'opacity-0 touch-none pointer-events-none'
-                            } transition-all duration-200 absolute top-0 bottom-0 left-0 right-0 flex flex-col justify-start items-center gap-2 bg-transparent w-full z-[500000]`}
+                            } transition-all duration-200 absolute top-0 bottom-0 left-0 right-0 flex flex-col justify-start items-center gap-2 bg-transparent w-full overflow-clip z-[500000]`}
                     >
                         <div
                             className={`${searchActive
@@ -99,17 +102,19 @@ function App() {
                     </div>
 
                     {/* Main content below the navbar */}
-                    <div className="flex-1 pt-16 overflow-auto">
+                    <div className="flex-1 pt-16 overflow-auto no-scrollbar">
                         <Routes>
                             <Route path="/" element={<Home />} />
                             <Route path="/tv-shows" element={<TVShows />} />
                             <Route path="/movies" element={<Movies />} />
+                            <Route path="/title" element={<Title />} />
                             <Route path="/account" element={<Account />} />
+                            <Route path="/login" element={<Login />} />
                             <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                         </Routes>
 
                         {/* Footer */}
-                        {!noFooterPages.includes(window.location.pathname) && (
+                        {!noFooterPages.includes(window.location.pathname.slice(0, 1)) && (
                             <div className="flex items-center justify-center w-full h-20 bg-[#191919]">
                                 <Footer />
                             </div>

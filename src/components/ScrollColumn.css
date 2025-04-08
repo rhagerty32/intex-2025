@@ -1,0 +1,51 @@
+.scroll-container {
+    overflow: hidden;
+    position: relative;
+}
+
+.scroll-content {
+    display: flex;
+    flex-direction: column;
+    row-gap: 1rem;
+    animation-duration: 3000s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+}
+
+.scroll-item {
+    padding: 0.5rem;
+    color: white;
+    white-space: nowrap;
+    font-size: 14px;
+    text-align: left;
+}
+
+/* Downward scroll */
+.scroll-down {
+    animation-name: scrollDown;
+}
+
+/* Upward scroll */
+.scroll-up {
+    animation-name: scrollUp;
+}
+
+@keyframes scrollDown {
+    0% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY(-50%);
+    }
+}
+
+@keyframes scrollUp {
+    0% {
+        transform: translateY(-50%);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}

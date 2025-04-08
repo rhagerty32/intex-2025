@@ -1,25 +1,51 @@
 import { FiTv } from "react-icons/fi";
-import { MdPerson } from "react-icons/md";
 import { Link } from "react-router-dom";
 import { FiSearch } from 'react-icons/fi'
-import React, { forwardRef, useEffect, useState } from "react";
+import React, { forwardRef } from "react";
 import { LuCommand } from "react-icons/lu";
 import { TbMovie } from "react-icons/tb";
 import { Logo } from "./logo";
+import { LuLogOut } from "react-icons/lu";
+import { useAuthStore } from "../utils/useAuthStore";
 
 export const Navbar = forwardRef<HTMLInputElement, { setSearchActive: (value: boolean) => void }>(({ setSearchActive }, ref) => {
+    const setLogin = useAuthStore((state) => state.setLoggedIn);
+    const isLogginIn = useAuthStore((state) => state.isLoggedIn);
+    const handleLogout = () => {
+        sessionStorage.clear();
+        localStorage.clear();
+        setLogin(false);
+        window.location.href = '/';
+    };
 
-    const HeaderLink = ({ icon, text, link }: { icon: any, text: string, link: string }) => {
-        return (
-            <Link to={link} className="flex flex-row justify-center items-center hover:bg-zinc-800 p-2 my-2 rounded gap-2 cursor-pointer transition">
-                <div className="flex lg:hidden xl:flex">
-                    {icon}
+    const handleLogin = () => {
+        window.location.href = '/login';
+    };
+
+    const HeaderLink = ({ icon, text, link }: { icon: any, text: string, link?: string }) => {
+        if (!link) {
+            return (
+                <div onClick={isLogginIn ? handleLogout : handleLogin} className="flex flex-row justify-center items-center hover:bg-zinc-800 group p-2 my-2 rounded gap-2 cursor-pointer transition">
+                    <div className="flex lg:hidden xl:flex">
+                        {icon}
+                    </div>
+                    <div className="hidden lg:flex xl:flex group-hover:text-[#EA8C55] transition">
+                        <p>{isLogginIn ? text : 'Log In'}</p>
+                    </div>
                 </div>
-                <div className="hidden lg:flex xl:flex">
-                    <p>{text}</p>
-                </div>
-            </Link>
-        );
+            );
+        } else {
+            return (
+                <Link to={link ?? ''} className="flex flex-row justify-center items-center hover:bg-zinc-800 p-2 my-2 rounded gap-2 cursor-pointer transition">
+                    <div className="flex lg:hidden xl:flex">
+                        {icon}
+                    </div>
+                    <div className="hidden lg:flex xl:flex">
+                        <p>{text}</p>
+                    </div>
+                </Link>
+            );
+        }
     };
 
     const headerLinks = [
@@ -29,14 +55,13 @@ export const Navbar = forwardRef<HTMLInputElement, { setSearchActive: (value: bo
             link: "/tv-shows"
         },
         {
-            icon: <TbMovie className="text-zinc-100" />,
+            icon: <TbMovie size={20} className="text-zinc-100" />,
             text: "Movies",
             link: "/movies"
         },
         {
-            icon: <MdPerson size={24} className="text-zinc-100" />,
-            text: "Account",
-            link: "/account"
+            icon: <LuLogOut size={19} className="text-zinc-100 group-hover:text-[#EA8C55] transition" />,
+            text: "Log Out",
         }
     ];
 

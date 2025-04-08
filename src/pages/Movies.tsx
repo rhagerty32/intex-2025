@@ -85,7 +85,7 @@ export const Movies = () => {
     console.log(`Selected genre: ${selectedGenre}`)
 
     return (
-        <div className="flex flex-col items-center justify-center bg-[#191919] no-scrollbar w-full gap-10 mt-10">
+        <div className="flex flex-col items-center min-h-screen justify-center bg-[#191919] no-scrollbar w-full gap-10 mt-10">
             <p className='font-semibold text-4xl -mt-5 -mb-5 text-shadow-lg text-white'>Movies</p>
 
             {loading && (

@@ -11,17 +11,14 @@ export const Footer = () => {
                 <Link to="/privacy-policy" className="text-white font-extralight hover:text-gray-400">
                     Privacy Policy
                 </Link>
-                <Link to="/terms-of-service" className="text-white font-extralight hover:text-gray-400">
+                <Link to="/tv-shows" className="text-white font-extralight hover:text-gray-400">
                     TV Shows
                 </Link>
-                <Link to="/contact" className="text-white font-extralight hover:text-gray-400">
+                <Link to="/movies" className="text-white font-extralight hover:text-gray-400">
                     Movies
                 </Link>
-                <Link to="/about" className="text-white font-extralight hover:text-gray-400">
-                    Genres
-                </Link>
-                <Link to="/help" className="text-white font-extralight hover:text-gray-400">
-                    Sign Out
+                <Link to="/account" className="text-white font-extralight hover:text-gray-400">
+                    Account
                 </Link>
             </div>
             <p className="text-[#D9D9D9] font-extralight">

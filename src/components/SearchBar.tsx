@@ -41,11 +41,13 @@ type Props = {
 
 
 const SearchBar = forwardRef<HTMLInputElement, Props>(({ setSearchActive, shouldHighlight }, ref) => {
-    const [searchResults, setSearchResults] = useState<SearchItem[]>([])
-    const [selectedIndex, setSelectedIndex] = useState(0)
-    const [fuse, setFuse] = useState<Fuse<SearchItem> | null>(null)
-    const navigate = useNavigate()
+    const [searchResults, setSearchResults] = useState<SearchItem[]>([]);
+    const [selectedIndex, setSelectedIndex] = useState(0);
+    const [fuse, setFuse] = useState<Fuse<SearchItem> | null>(null);
+    const navigate = useNavigate();
 
+    // TODO This crashes sometimes because it's too much to process.
+    // This will have to be fixed with backend queries (SQL)
     useEffect(() => {
         fetch('/movies_titles.csv')
             .then((res) => res.text())
@@ -54,32 +56,37 @@ const SearchBar = forwardRef<HTMLInputElement, Props>(({ setSearchActive, should
                     header: true,
                     skipEmptyLines: true,
                     complete: (result) => {
-                        const movieItems = result.data.filter((row) => row.title?.trim())
+                        const raw = result.data.filter((row) => row.title?.trim())
 
-                        const indexedMovies = movieItems.map((movie) => ({
+                        // Limit indexed items (you can increase later if stable)
+                        const sliced = raw.slice(0, 3000)
+
+                        const indexedMovies = sliced.map((movie) => ({
                             title: `${movie.title}`,
-                            path: `/movies/${movie.show_id}`,
+                            path: `/title?titleID=${movie.show_id}`,
                             keywords: [
-                                movie.title?.toLowerCase() ?? '',
-                                movie.description?.toLowerCase() ?? '',
-                                movie.director?.toLowerCase() ?? '',
-                                movie.cast?.toLowerCase() ?? '',
-                                movie.country?.toLowerCase() ?? '',
-                                movie.release_year ?? '',
-                                movie.rating?.toLowerCase() ?? '',
-                                movie.duration?.toLowerCase() ?? '',
+                                movie.title?.toLowerCase(),
+                                movie.description?.toLowerCase(),
+                                movie.director?.toLowerCase(),
+                                movie.cast?.toLowerCase(),
+                                movie.country?.toLowerCase(),
+                                movie.release_year,
+                                movie.rating?.toLowerCase(),
+                                movie.duration?.toLowerCase(),
                                 ...Object.keys(movie)
-                                    .filter((key) => movie[key] === '1') // genre flags
-                                    .map((genre) => genre.toLowerCase())
-                            ],
+                                    .filter((key) => movie[key] === '1')
+                                    .map((genre) => genre.toLowerCase()),
+                            ].filter(Boolean), // only keep valid strings
                             data: movie,
                         }))
 
                         const fullIndex = [...SEARCH_INDEX, ...indexedMovies]
 
+                        // Use "includeScore" for better sorting if needed
                         const fuseInstance = new Fuse(fullIndex, {
                             keys: ['title', 'keywords'],
                             threshold: 0.3,
+                            minMatchCharLength: 2,
                         })
 
                         setFuse(fuseInstance)
@@ -172,8 +179,8 @@ const SearchBar = forwardRef<HTMLInputElement, Props>(({ setSearchActive, should
             const [type, _name] = result.title.split('~~')
             if (type === 'Movie' && result.data) {
                 sessionStorage.setItem('selectedMovie', JSON.stringify(result.data))
-            }
-        }
+            };
+        };
 
         navigate(result.path)
         setSearchActive(false)

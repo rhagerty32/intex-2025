@@ -11,8 +11,15 @@ declare global {
         duration: string
         description: string
         random_rating: string
+        tomatoRating: number,
+        imdbRating: number,
         [key: string]: any
     };
+
+    type RecentlyAdded = {
+        obj: Title
+        genres: string[]
+    }
 }
 
 export { }
